@@ -20,14 +20,14 @@ function init({ productService }) {
             name: req.body.name,
             description: req.body.description
         });
-        return res.send(product);
+        return res.send(toResponseModel(product));
     });
 
     router.delete('/:id', async (req, res) => {
         const product = await productService.deleteById({ id: req.params.id });
         return res.send(toResponseModel(product));
     })
-    
+
     return router;
 }
 

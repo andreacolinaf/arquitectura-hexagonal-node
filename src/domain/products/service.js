@@ -1,6 +1,5 @@
-function init({
-    productRepository
-}) {
+function init({ productRepository }) {
+    
     async function findById({ id }) {
         return await productRepository.getProduct({ id });
     }

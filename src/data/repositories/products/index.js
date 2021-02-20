@@ -5,6 +5,7 @@ const productStore = {
     async createProduct(params) {
         try {
             const { Product : productSchema } = this.getSchemas();
+            console.log('shoppingCartSchema', this.getSchemas());
             const product = new productSchema({
                 name: params.name,
                 description: params.description,
@@ -55,9 +56,5 @@ const productStore = {
 };
 
 module.exports.init = ({ Product }) => Object.assign(Object.create(productStore), {
-    getSchemas() {
-      return {
-        Product,
-      };
-    },
-  });
+    getSchemas() { return { Product }; }
+});
