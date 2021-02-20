@@ -19,7 +19,7 @@ const productStore = {
     async getProduct(params) {
         try {
             const { Product : productSchema } = this.getSchemas();
-            const product = await productSchema.findOne({name : params.name});
+            const product = await productSchema.findOne({_id : params.id});
             if(!product) {
                 throw new Error('Product not found');
             }

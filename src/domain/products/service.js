@@ -1,19 +1,19 @@
 function init({
-    productsRepository
+    productRepository
 }) {
     async function findById({ id }) {
-        const product = await productsRepository.getProduct({ id });
+        const product = await productRepository.getProduct({ id });
         return {
             product
         };
     }
 
     async function findAllProducts() {
-        return await postsRepository.findAll();
+        return await productRepository.findAll();
     }
 
     async function deleteById({ id }) {
-        const product = await productsRepository.deleteById({ id });
+        const product = await productRepository.deleteById({ id });
         return {
             product
         };
@@ -23,7 +23,7 @@ function init({
         name,
         description
     }) {
-        return await postsRepository.create({ name, description });
+        return await productRepository.createProduct({ name, description });
     }
 
     return {

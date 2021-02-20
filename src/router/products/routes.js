@@ -1,25 +1,24 @@
 const express = require('express');
-const { toResponseModel } = require('./response');
+const { toResponseModel } = require('./mapper');
 
 const router = new express.Router();
 
 function init({ productService }) {
     router.get('/:id', async (req, res) => {
-        const product = await productService.findById({
+        const doc = await productService.findById({
             id: req.params.id,
         });
-        return res.send({
-            data: Object.assign({},
-                toResponseModel(product))
-        });
+        return res.send(toResponseModel(doc.product));
     });
 
     router.post('/', async (req, res) => {
+        console.log('Request body: ', req.body);
+        console.log('productService', productService);
         const product = await productService.create({
-            name: req.params.name,
-            description: req.params.description
+            name: req.body.name,
+            description: req.body.description
         });
-        return res.send({ data: product });
+        return res.send(product);
     });
 
     //TODO: completar el resto de endpoint: PRODUCT getall, delete
