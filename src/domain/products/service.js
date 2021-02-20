@@ -2,10 +2,7 @@ function init({
     productRepository
 }) {
     async function findById({ id }) {
-        const product = await productRepository.getProduct({ id });
-        return {
-            product
-        };
+        return await productRepository.getProduct({ id });
     }
 
     async function findAllProducts() {
@@ -13,16 +10,10 @@ function init({
     }
 
     async function deleteById({ id }) {
-        const product = await productRepository.deleteById({ id });
-        return {
-            product
-        };
+        return await productRepository.deleteById({ id });
     }
 
-    async function create({
-        name,
-        description
-    }) {
+    async function create({ name, description }) {
         return await productRepository.createProduct({ name, description });
     }
 
