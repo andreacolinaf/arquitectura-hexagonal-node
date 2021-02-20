@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 const schemasFactory = require('./schemas');
-const logging = require('../../../common/logging');
 mongoose.Promise = require('bluebird');
 
 module.exports = ({ dbConnectionString }) => {
@@ -14,19 +13,19 @@ module.exports = ({ dbConnectionString }) => {
 
     // Check for errors on connecting to Mongo DB
     mongoose.connection.on('error', (err) => {
-        logging.error(`Error! DB Connection failed. Error: ${err}`);
+        console.log(`Error! DB Connection failed. Error: ${err}`);
         return err;
     });
 
     // Connection opened successfully
     mongoose.connection.once('open', () => {
-        logging.info('Connection to MongoDB established');
+        console.log('Connection to MongoDB established');
         // mongoose.connection.db.dropDatabase()
     });
 
     mongoose.connection.on('disconnected', () => {
-        logging.info('Connection to MongoDB closed');
-        logging.info('-------------------');
+        console.log('Connection to MongoDB closed');
+        console.log('-------------------');
     });
 
     const schemas = schemasFactory.create(mongoose);

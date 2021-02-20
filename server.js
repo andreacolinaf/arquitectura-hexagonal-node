@@ -1,61 +1,23 @@
-var app = require('./app');
-var debug = require('debug')('arquitectura-hexagonal-node:server');
-var http = require('http');
+const productsRepositoryContainer = require('./src/data/repositories/products');
+const productsServiceContainer = require('./src/domain/products/service');
+const appContainer = require('./src/router/app')
+const db = require('./src/data/infrastructure/db')({dbConnectionString: 'mongodb://127.0.0.1:27017/shopping-cart'});
 
-var port = normalizePort(process.env.PORT || '3000');
-app.set('port', port);
+const productsRepository = productsRepositoryContainer.init(db.schemas);
 
-var server = http.createServer(app);
+const productsService = productsServiceContainer.init({ productsRepository });
 
-server.listen(port);
-server.on('error', onError);
-server.on('listening', onListening);
+const app = appContainer.init({ productsService });
 
+let server = app.listen('3000', () => {
+  console.log('App listening on port 3000!');
+});
 
-function onError(error) {
-  if (error.syscall !== 'listen') {
-    throw error;
+(async () => {
+  try {
+    await db.connect();
+  } catch (error) {
+    await db.close();
+    await server.close();
   }
-
-  var bind = typeof port === 'string'
-    ? 'Pipe ' + port
-    : 'Port ' + port;
-
-  // handle specific listen errors with friendly messages
-  switch (error.code) {
-    case 'EACCES':
-      console.error(bind + ' requires elevated privileges');
-      process.exit(1);
-      break;
-    case 'EADDRINUSE':
-      console.error(bind + ' is already in use');
-      process.exit(1);
-      break;
-    default:
-      throw error;
-  }
-}
-
-function onListening() {
-  var addr = server.address();
-  var bind = typeof addr === 'string'
-    ? 'pipe ' + addr
-    : 'port ' + addr.port;
-  debug('Listening on ' + bind);
-}
-
-function normalizePort(val) {
-  var port = parseInt(val, 10);
-
-  if (isNaN(port)) {
-    // named pipe
-    return val;
-  }
-
-  if (port >= 0) {
-    // port number
-    return port;
-  }
-
-  return false;
-}
+})();
