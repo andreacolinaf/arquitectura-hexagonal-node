@@ -6,7 +6,7 @@ const shoppingCartStore = {
     async createShoppingCart() {
         try {
             const { ShoppingCart : shoppingCartSchema } = this.getSchemas();
-            const shoppingCart = new shoppingCartSchema({ });
+            const shoppingCart = new shoppingCartSchema({ state: ShoppingCartDomainModel.STATES.INITIAL });
             const savedCart = await shoppingCart.save();
             return mapper.toDomainModel(savedCart, ShoppingCartDomainModel);
         } catch (e) {
@@ -18,10 +18,12 @@ const shoppingCartStore = {
         try {
             const { ShoppingCart : shoppingCartSchema } = this.getSchemas();
 
-            const updatedShoppingCart = await shoppingCartSchema.findOneAndUpdate(
-                { _id: params.shoppingCart, "products.product": mapper.toObjectId(params.product.id) },
-                { $set: { "products.$.quantity": params.product.quantity }});
-            return mapper.toDomainModel(updatedShoppingCart, ShoppingCartDomainModel);
+            const shoppingCartFound = await shoppingCartSchema.findOne({ _id: params.shoppingCart });
+            const productToUpdate = shoppingCartFound.products.filter(item => item.product.toString() == params.product.id)[0];
+            productToUpdate.quantity = params.product.quantity
+            const shoppingCartSaved = await shoppingCartFound.save();
+
+            return mapper.toDomainModel(shoppingCartSaved, ShoppingCartDomainModel);
         } catch (e) {
             throw e;
         }
@@ -31,10 +33,12 @@ const shoppingCartStore = {
         try {
             const { ShoppingCart : shoppingCartSchema } = this.getSchemas();
 
-            const updatedShoppingCart = await shoppingCartSchema.findOneAndUpdate(
-                { _id: params.shoppingCart },
-                { $push: { "products": { product: mapper.toObjectId(params.product.id), quantity: params.product.quantity } }});
-            return mapper.toDomainModel(updatedShoppingCart, ShoppingCartDomainModel);
+            const shoppingCartFound = await shoppingCartSchema.findOne({ _id: params.shoppingCart });
+            shoppingCartFound.state = ShoppingCartDomainModel.STATES.IN_PROGRESS
+            shoppingCartFound.products.push({ product: mapper.toObjectId(params.product.id), quantity: params.product.quantity });
+            const shoppingCartSaved = await shoppingCartFound.save();
+
+            return mapper.toDomainModel(shoppingCartSaved, ShoppingCartDomainModel);
         } catch (e) {
             throw e;
         }

@@ -1,6 +1,7 @@
 class ShoppingCartResponse {
-    constructor({ id, products } = {}) {
+    constructor({ id, state, products } = {}) {
       this.id = id;
+      this.state = state;
       this.products = products;
     }
   }

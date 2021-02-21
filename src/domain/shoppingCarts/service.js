@@ -17,14 +17,9 @@ function init({ shoppingCartRepository, productRepository }) {
         const shoppingCartProduct = shoppingCartFound.products.filter(item => item.product == product)[0];
         let savedShoppingCart;
         if (shoppingCartProduct) {
-            savedShoppingCart = await shoppingCartRepository.updateExistingProductShoppingCart({ shoppingCart, product: productToAdd })
-            savedShoppingCart.products.filter(item => item.product == product)[0].quantity = quantity;
+            savedShoppingCart = await shoppingCartRepository.updateExistingProductShoppingCart({ shoppingCart, product: productToAdd });
         } else {
             savedShoppingCart = await shoppingCartRepository.updateUnexistingProductShoppingCart({ shoppingCart, product: productToAdd });
-            savedShoppingCart.products.push({
-                product: productToAdd.id,
-                quantity: productToAdd.quantity
-            });
         }
         return savedShoppingCart;
     }

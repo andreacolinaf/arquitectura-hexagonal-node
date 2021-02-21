@@ -13,6 +13,9 @@ function create(mongoose) {
   });
 
   const shoppingCartSchema = mongoose.Schema({
+      state: {
+        type: String
+      },
       products: [productSubschema],
     },
     {
