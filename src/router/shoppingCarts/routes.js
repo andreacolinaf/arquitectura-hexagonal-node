@@ -3,7 +3,7 @@ const { toResponseModel } = require('./mapper');
 
 const router = new express.Router();
 
-function init({ shoppingCartService }) {
+function init({ shoppingCartService, shoppingCartValidator }) {
 
     router.post('/', async (req, res) => {
         const shoppingCart = await shoppingCartService.create();
@@ -21,8 +21,13 @@ function init({ shoppingCartService }) {
     })
 
     router.patch('/:cart_id', async (req, res) => {
-        const shoppingCart = await shoppingCartService.finalize({ shoppingCart: req.params.cart_id });
-        return res.send(toResponseModel(shoppingCart));
+        const valid = shoppingCartValidator.validate();
+        if (valid) {
+            const shoppingCart = await shoppingCartService.finalize({ shoppingCart: req.params.cart_id });
+            return res.send(toResponseModel(shoppingCart));
+        } else {
+            return res.send({ error: 'There are some unavailable products at this moment.' });
+        }
     })
 
     router.get('/:cart_id', async (req, res) => {
