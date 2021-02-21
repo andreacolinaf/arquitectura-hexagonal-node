@@ -7,7 +7,7 @@
     "dev": "nodemon ./server.js -e js",
     "test": "jest",
     "test-product": "jest test/products",
-    "test-unitary": "jest test/unitary"
+    "test-shopping-cart": "jest test/shoppingCarts"
   },
   "dependencies": {
     "express": "~4.16.1",

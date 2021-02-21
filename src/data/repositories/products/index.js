@@ -5,7 +5,6 @@ const productStore = {
     async createProduct(params) {
         try {
             const { Product : productSchema } = this.getSchemas();
-            console.log('shoppingCartSchema', this.getSchemas());
             const product = new productSchema({
                 name: params.name,
                 description: params.description,

@@ -5,7 +5,6 @@ const toDomainModel = function toDomainModel(databaseDoc, DomainModel) {
 };
 
 const toObjectId = function toObjectId(id) {
-  console.log('id', id);
   return new mongoose.Types.ObjectId(id);
 }
 
