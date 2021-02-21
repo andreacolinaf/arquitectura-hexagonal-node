@@ -3,7 +3,7 @@ const ShoppingCartDomainModel = require('../../../domain/shoppingCarts/model');
 
 const shoppingCartStore = {
 
-    async createShoppingCart() {
+    async create() {
         try {
             const { ShoppingCart : shoppingCartSchema } = this.getSchemas();
             const shoppingCart = new shoppingCartSchema({ state: ShoppingCartDomainModel.STATES.INITIAL });
@@ -14,7 +14,7 @@ const shoppingCartStore = {
         }
     },
 
-    async updateExistingProductShoppingCart(params) {
+    async updateExistingProduct(params) {
         try {
             const { ShoppingCart : shoppingCartSchema } = this.getSchemas();
 
@@ -29,7 +29,7 @@ const shoppingCartStore = {
         }
     },
 
-    async updateUnexistingProductShoppingCart(params) {
+    async updateUnexistingProduct(params) {
         try {
             const { ShoppingCart : shoppingCartSchema } = this.getSchemas();
 
@@ -44,7 +44,21 @@ const shoppingCartStore = {
         }
     },
 
-    async getShoppingCart(params) {
+    async finalize(params) {
+        try {
+            const { ShoppingCart : shoppingCartSchema } = this.getSchemas();
+
+            const shoppingCartFound = await shoppingCartSchema.findOne({ _id: params.shoppingCart });
+            shoppingCartFound.state = ShoppingCartDomainModel.STATES.FINAL;
+            const shoppingCartSaved = await shoppingCartFound.save();
+
+            return mapper.toDomainModel(shoppingCartSaved, ShoppingCartDomainModel);
+        } catch (e) {
+            throw e;
+        }
+    },
+
+    async get(params) {
         try {
             const { ShoppingCart : shoppingCartSchema } = this.getSchemas();
             let shoppingCart = await shoppingCartSchema.findOne({ _id: params.shoppingCart });
@@ -52,6 +66,36 @@ const shoppingCartStore = {
                 throw new Error('Shopping cart not found');
             }
             return mapper.toDomainModel(shoppingCart, ShoppingCartDomainModel);
+        } catch (e) {
+            throw e;
+        }
+    },
+
+    async remove(params) {
+        try {
+            const { ShoppingCart : shoppingCartSchema } = this.getSchemas();
+            let shoppingCart = await shoppingCartSchema.deleteOne({ _id: params.shoppingCart });
+            if (!shoppingCart) {
+                throw new Error('Shopping cart not found');
+            }
+            return mapper.toDomainModel(shoppingCart, ShoppingCartDomainModel);
+        } catch (e) {
+            throw e;
+        }
+    },
+
+    async removeProduct(params) {
+        try {
+            const { ShoppingCart : shoppingCartSchema } = this.getSchemas();
+            const shoppingCartFound = await shoppingCartSchema.findOne({ _id: params.shoppingCart });
+            if (!shoppingCartFound) {
+                throw new Error('Shopping cart not found');
+            }
+            const finalProducts = shoppingCartFound.products.filter(item => item.product.toString() != params.product);
+            shoppingCartFound.products = finalProducts;
+            const shoppingCartSaved = await shoppingCartFound.save();
+
+            return mapper.toDomainModel(shoppingCartSaved, ShoppingCartDomainModel);
         } catch (e) {
             throw e;
         }
