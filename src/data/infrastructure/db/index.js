@@ -1,50 +1,48 @@
 const mongoose = require('mongoose');
-const schemasFactory = require('./schemas');
 mongoose.Promise = require('bluebird');
 
-module.exports = ({ dbConnectionString }) => {
-    if (!dbConnectionString) {
-        throw new Error('add correct format of config with dbConnectionString');
-    }
-    const options = {
-        useMongoClient: true,
-        promiseLibrary: require('bluebird'),
-    };
+const dbConnectionString = 'mongodb://127.0.0.1:27017/shopping-cart';
 
-    // Check for errors on connecting to Mongo DB
-    mongoose.connection.on('error', (err) => {
-        console.log(`Error! DB Connection failed. Error: ${err}`);
-        return err;
-    });
+if (!dbConnectionString) {
+    throw new Error('add correct format of config with dbConnectionString');
+}
+const options = {
+    useMongoClient: true,
+    promiseLibrary: require('bluebird'),
+};
 
-    // Connection opened successfully
-    mongoose.connection.once('open', () => {
-        console.log('Connection to MongoDB established');
-        // mongoose.connection.db.dropDatabase()
-    });
+// Check for errors on connecting to Mongo DB
+mongoose.connection.on('error', (err) => {
+    console.log(`Error! DB Connection failed. Error: ${err}`);
+    return err;
+});
 
-    mongoose.connection.on('disconnected', () => {
-        console.log('Connection to MongoDB closed');
-        console.log('-------------------');
-    });
+// Connection opened successfully
+mongoose.connection.once('open', () => {
+    console.log('Connection to MongoDB established');
+    // mongoose.connection.db.dropDatabase()
+});
 
-    const schemas = schemasFactory.create(mongoose);
-    return Object.assign(
-        {
-            getConnection() {
-                return mongoose.connection;
-            },
+mongoose.connection.on('disconnected', () => {
+    console.log('Connection to MongoDB closed');
+    console.log('-------------------');
+});
 
-            connect() {
-                // Open Connection to Mongo DB
-                return mongoose.connect(dbConnectionString, options);
-            },
-            close() {
-                return mongoose.connection.close();
-            },
-        },
-        {
-            schemas,
-        },
-    );
+const getConnection = () => {
+    return mongoose.connection;
+};
+
+const connect = () => {
+    // Open Connection to Mongo DB
+    return mongoose.connect(dbConnectionString, options);
+};
+
+const close = () => {
+    return mongoose.connection.close();
+};
+
+module.exports = {
+    getConnection,
+    connect,
+    close
 };
