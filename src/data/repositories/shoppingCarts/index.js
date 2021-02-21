@@ -14,6 +14,32 @@ const shoppingCartStore = {
         }
     },
 
+    async updateExistingProductShoppingCart(params) {
+        try {
+            const { ShoppingCart : shoppingCartSchema } = this.getSchemas();
+
+            const updatedShoppingCart = await shoppingCartSchema.findOneAndUpdate(
+                { _id: params.shoppingCart, "products.product": mapper.toObjectId(params.product.id) },
+                { $set: { "products.$.quantity": params.product.quantity }});
+            return mapper.toDomainModel(updatedShoppingCart, ShoppingCartDomainModel);
+        } catch (e) {
+            throw e;
+        }
+    },
+
+    async updateUnexistingProductShoppingCart(params) {
+        try {
+            const { ShoppingCart : shoppingCartSchema } = this.getSchemas();
+
+            const updatedShoppingCart = await shoppingCartSchema.findOneAndUpdate(
+                { _id: params.shoppingCart },
+                { $push: { "products": { product: mapper.toObjectId(params.product.id), quantity: params.product.quantity } }});
+            return mapper.toDomainModel(updatedShoppingCart, ShoppingCartDomainModel);
+        } catch (e) {
+            throw e;
+        }
+    },
+
     async getShoppingCart(params) {
         try {
             const { ShoppingCart : shoppingCartSchema } = this.getSchemas();
@@ -21,29 +47,7 @@ const shoppingCartStore = {
             if (!shoppingCart) {
                 throw new Error('Shopping cart not found');
             }
-            
-            const product = shoppingCart.products.filter((item => item.product == params.product));
-
-            if (product.length > 0) {
-                product[0]['quantity'] = params.quantity;
-                console.log('product', product);
-            } else {
-                const { Product : productSchema } = this.getSchemas();
-                const productFound = await productSchema.findOne({ _id : params.product });
-                
-                if(!productFound) {
-                    throw new Error('Product not found');
-                }
-                shoppingCart.products.push({
-                    product: productFound._id,
-                    quantity: params.quantity
-                });
-            }
-            const savedShoppingCart = await shoppingCart.save();
-            savedShoppingCart.populate('products.product').execPopulate();
-            console.log('savedShoppingCart', savedShoppingCart.products);
-
-            return mapper.toDomainModel(savedShoppingCart, ShoppingCartDomainModel);
+            return mapper.toDomainModel(shoppingCart, ShoppingCartDomainModel);
         } catch (e) {
             throw e;
         }

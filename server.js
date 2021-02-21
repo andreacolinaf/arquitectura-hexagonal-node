@@ -9,7 +9,7 @@ const productRepository = productRepositoryContainer.init(db.schemas);
 const productService = productServiceContainer.init({ productRepository });
 
 const shoppingCartRepository = shoppingCartRepositoryContainer.init(db.schemas);
-const shoppingCartService = shoppingCartServiceContainer.init({ shoppingCartRepository });
+const shoppingCartService = shoppingCartServiceContainer.init({ shoppingCartRepository, productRepository });
 
 const app = appContainer.init({ productService, shoppingCartService });
 
