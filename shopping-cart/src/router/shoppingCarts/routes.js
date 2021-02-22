@@ -21,13 +21,17 @@ function init({ shoppingCartService, shoppingCartValidator }) {
     })
 
     router.patch('/:cart_id', async (req, res) => {
-        const valid = shoppingCartValidator.validate();
-        if (valid) {
-            const shoppingCart = await shoppingCartService.finalize({ shoppingCart: req.params.cart_id });
-            return res.send(toResponseModel(shoppingCart));
-        } else {
-            return res.send({ error: 'There are some unavailable products at this moment.' });
-        }
+        const valid = shoppingCartValidator.validate( async (error, { valid } = {}) => {
+            if (error) {
+                return res.status(500).send({ error })
+            }
+            if (valid) {
+                const shoppingCart = await shoppingCartService.finalize({ shoppingCart: req.params.cart_id });
+                return res.send(toResponseModel(shoppingCart));
+            } else {
+                return res.send({ error: 'There are some unavailable products at this moment.' });
+            }
+        });
     })
 
     router.get('/:cart_id', async (req, res) => {
